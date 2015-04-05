@@ -9,8 +9,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.PistonBaseMaterial;
 import org.bukkit.plugin.EventExecutor;
 
@@ -46,9 +44,7 @@ public class MC_MachineryBlockListener implements Listener, EventExecutor {
             Block relativePiston = blockplaced.getRelative(BlockFace.UP, 2);
             if(relativePiston.getType() == Material.PISTON_BASE && relativePiston.getState().getData() instanceof  PistonBaseMaterial){
                 PistonBaseMaterial pistonMat = (PistonBaseMaterial)relativePiston.getState().getData();
-                //System.out.println("Hopper sees piston_base 2blocks above!");
                 if(pistonMat.getFacing() == BlockFace.DOWN) {
-                    //System.out.println("New Grinder at: " + blockplaced.getRelative(BlockFace.UP).getLocation());
                     instance.activeGrinders.add(blockplaced.getRelative(BlockFace.UP).getLocation());
                 }
             }
@@ -56,9 +52,7 @@ public class MC_MachineryBlockListener implements Listener, EventExecutor {
         //Adding new active grinder to plugin, top -> bottom
         if(blockMaterial == Material.PISTON_BASE && blockplaced.getState().getData() instanceof PistonBaseMaterial){
             PistonBaseMaterial pistonData = (PistonBaseMaterial) blockplaced.getState().getData();
-            //System.out.println("Piston placed is facing : " + pistonData.getFacing().toString());
             if(pistonData.getFacing() == BlockFace.DOWN && blockplaced.getRelative(BlockFace.DOWN, 2).getType() == Material.HOPPER){
-                //System.out.println("New Grinder at: " + blockplaced.getRelative(BlockFace.DOWN).getLocation());
                 instance.activeGrinders.add(blockplaced.getRelative(BlockFace.DOWN).getLocation());
             }
         }
@@ -66,28 +60,26 @@ public class MC_MachineryBlockListener implements Listener, EventExecutor {
         //Checking location to be on top of active grinder
         if(blockMaterial == Material.GRAVEL || blockMaterial == Material.COBBLESTONE){
             if(instance.activeGrinders.contains(event.getBlockPlaced().getLocation())){
-                //doSomething
-                System.out.println("THERE'S GOOD BLOCK IN ACTIVE GRINDER!");
+                //Pass block to main plugin to 'grind' the block
+                instance.grindBlock(blockplaced);
             }
         }
     }
 
     @EventHandler
     public void onBlockBreak( BlockBreakEvent event ){
-        //Removing grinder on hopper break;
+        //Removing grinder on hopper break
         if(event.getBlock().getType() == Material.HOPPER){
             Location grinderCheck = event.getBlock().getRelative(BlockFace.UP).getLocation();
             if(instance.activeGrinders.contains(grinderCheck)){
                 instance.activeGrinders.remove(grinderCheck);
-                //System.out.println("Removing grinder at: " + grinderCheck.toString());
             }
         }
-
+        //Removing grinder on Piston break
         if(event.getBlock().getType() == Material.PISTON_BASE){
             Location grinderCheck = event.getBlock().getRelative(BlockFace.DOWN).getLocation();
             if(instance.activeGrinders.contains(grinderCheck)){
                 instance.activeGrinders.remove(grinderCheck);
-                //System.out.println("Removing grinder at: " + grinderCheck.toString());
             }
         }
     }
