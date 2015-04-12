@@ -1,0 +1,7 @@
+GrinderPatterns:
+  pattern1:
+    from: COBBLESTONE
+    to: GRAVEL
+  pattern2:
+    from: GRAVEL
+    to: SAND
