@@ -41,7 +41,7 @@ public class MC_MachineryPlugin extends JavaPlugin{
         getServer().getPluginManager().registerEvent(BlockBreakEvent.class, listener, EventPriority.NORMAL, listener, this);
 
         loadConfig();
-        //loadLocations();
+        loadLocations();
     }
 
     private void saveLocations(){
@@ -63,19 +63,27 @@ public class MC_MachineryPlugin extends JavaPlugin{
         }
     }
 
-    private void loadLocations(){
+    private void loadLocations() {
+        File dataFolder = this.getDataFolder();
+        if (!dataFolder.exists()) dataFolder.mkdir();
+
+        File locationFile = new File(this.getDataFolder().getAbsolutePath() + "/locations.yml");
+        if (!locationFile.exists()) return; // No data or fresh installation of plugin. Locations will be saved once run.
+
         try {
-            BufferedReader fw = new BufferedReader(new FileReader("/MC_Machinery/locations.yml"));
+            BufferedReader fw = new BufferedReader(new FileReader(locationFile));
             String line = fw.readLine();
-            while(line != null || line.compareTo("") != 0) {
-                String[] coords = line.split(", ");
+            while(line != null) {
+                if (line.compareTo("") != 0) {
+                    String[] coords = line.split(", ");
 
-                Location block = getServer().getWorld(coords[0]).getBlockAt(
-                        Integer.parseInt(coords[1]),
-                        Integer.parseInt(coords[2]),
-                        Integer.parseInt(coords[3])).getLocation();
+                    Location block = getServer().getWorld(coords[0]).getBlockAt(
+                            Integer.parseInt(coords[1]),
+                            Integer.parseInt(coords[2]),
+                            Integer.parseInt(coords[3])).getLocation();
 
-                activeGrinders.add(block);
+                    activeGrinders.add(block);
+                }
 
                 line = fw.readLine();
             }
